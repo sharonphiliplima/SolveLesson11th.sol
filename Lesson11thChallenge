@@ -1,0 +1,38 @@
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract i_helperContract {
+    function returnTrue() external pure returns (bool) {
+        return true;
+    }
+
+    function returnTrueWithGoodValues(uint256 nine, address contractAddress) public view returns (bool) {
+        if (nine == 9 && contractAddress == address(this)) {
+            return true;
+        }
+        return false;
+    }
+}
+
+contract YourSolutionContract {
+    i_helperContract private i_helperContractInstance;
+    //0x28B4144Fe74b486a87e68074189Aa60f59577602
+
+    constructor(address _i_helperContractAddress) {
+        i_helperContractInstance = i_helperContract(_i_helperContractAddress);
+    }
+
+    function solveChallenge() external view returns(bytes4, bytes memory)  {
+        bytes4 selectorOne = bytes4(keccak256(bytes("returnTrue()")));
+
+        // Construct input data using abi.encodeWithSelector
+        bytes memory inputData = abi.encodeWithSelector(
+            i_helperContractInstance.returnTrueWithGoodValues.selector,
+            9,
+            address(i_helperContractInstance)
+        );
+
+        return (selectorOne, inputData);
+
+    }
+}
